@@ -10,20 +10,18 @@ contract chainlinkOptions {
     struct option {
         address baseToken;    
         uint256 baseTokenPrice;
-        uint256 strike; //Price in USD (18 decimal places) option allows buyer to purchase tokens at
+        uint256 strike; //Price in wei option allows buyer to purchase tokens at
         uint256 premium; //Fee in contract token that option writer charges
         uint256 expiry; //Unix timestamp of expiration time
         uint256 amount; //Amount of tokens the option contract is for
         bool exercised; //Has option been exercised
         bool canceled; //Has option been canceled
-        uint256 latestCost; //Helper to show last updated cost to exercise
         address payable writer; //Issuer of option
         address payable buyer; //Buyer of option
     }
 
     option[] public tokenOpts;
 
-    //Kovan feeds: https://docs.chain.link/docs/reference-contracts
     constructor() {
         contractAddr = payable(address(this));
     }
@@ -33,8 +31,7 @@ contract chainlinkOptions {
     function writeOption(address baseTokenAddress, uint256 baseTokenPrice, uint strike, uint premium, uint expiry, uint tknAmt) public {
         // Need to authorize the contract to transfer funds on your behalf
         require(ERC20(baseTokenAddress).transferFrom(msg.sender, contractAddr, tknAmt), "Incorrect amount of TOKEN supplied");
-        uint256 latestCost = tknAmt * baseTokenPrice;
-        tokenOpts.push(option(baseTokenAddress, baseTokenPrice, strike, premium, expiry, tknAmt, false, false, latestCost, payable(msg.sender), payable(address(0))));
+        tokenOpts.push(option(baseTokenAddress, baseTokenPrice, strike, premium, expiry, tknAmt, false, false, payable(msg.sender), payable(address(0))));
     }
     
     //Purchase a call option, needs desired token, ID of option and payment
@@ -44,7 +41,6 @@ contract chainlinkOptions {
         require(tokenOpts[ID].buyer == address(0), "The option is already bought");
         require(msg.value == tokenOpts[ID].premium, "Incorrect amount of ETH sent for premium");
         tokenOpts[ID].writer.transfer(tokenOpts[ID].premium);
-        //require(ERC20(quoteTokenAddress).transferFrom(msg.sender, tokenOpts[ID].writer, tokenOpts[ID].premium), "Incorrect amount of TOKEN sent for premium");
         tokenOpts[ID].buyer = payable(msg.sender);
     }
     
@@ -59,7 +55,7 @@ contract chainlinkOptions {
         require(msg.value == exerciseVal, "Incorrect ETH amount sent to exercise");
         //Buyer exercises option, exercise cost paid to writer
         tokenOpts[ID].writer.transfer(exerciseVal);
-        //require(ERC20(tokenOpts[ID].quoteToken).transferFrom(msg.sender, tokenOpts[ID].writer, exerciseVal), "Incorrect TOKEN amount sent to exercise");
+
         //Pay buyer contract amount of TOKEN
         require(ERC20(tokenOpts[ID].baseToken).transfer(msg.sender, tokenOpts[ID].amount), "Error: buyer was not paid");
         tokenOpts[ID].exercised = true;
@@ -85,7 +81,6 @@ contract chainlinkOptions {
     //Updates lastestCost member of option which is publicly viewable
     function updateBaseTokenPrice(uint256 ID, uint256 baseTokenPrice) public {
         tokenOpts[ID].baseTokenPrice = baseTokenPrice;
-        tokenOpts[ID].latestCost = tokenOpts[ID].amount * baseTokenPrice;
     }
 
     function getTokenSupply(address _token) public view returns (uint256) {
