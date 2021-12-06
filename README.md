@@ -1,7 +1,7 @@
 # blockchainOptions
 Option trading as a decentralised entity on the blockchain
 
-dXdY Instructions
+**dXdY Instructions**
 1. Load the code in remix
 2. Compile creator.sol
 3. Deploy creator.sol and make sure to choose Injected Web3 for Environment and creator.sol for Contract
@@ -54,12 +54,15 @@ dXdY Instructions
 16. You can see the state of all options getOptionProperties
 
 
+####################################################################
 
 
+**Chainlink Instructions**
 
-
-
-Chainlink Instructions
-Much easier than dYdX. Just publish the contract, login with writer to write the option, login with buyer to buy the option. The id of the option is just its index in the list.
+Much easier than dYdX. 
+1. Publish the contract
+2. Login with writer to write the option
+3. login with buyer to buy the option. The id of the option is just its index in the list.
+4. Exercise the option and both writer and buyer will get their funds immediately
 
 
