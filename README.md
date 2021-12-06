@@ -13,4 +13,14 @@ dXdY
 ![image](https://user-images.githubusercontent.com/15021790/144903382-4bd50054-167a-486a-b4ab-ec101b9f7ec2.png)
 7. Verify it if needed. This can be done by flattening the files from remix with a flattener plugin
 ![image](https://user-images.githubusercontent.com/15021790/144903577-1caca09a-f305-4eac-993a-ebbf49ae7cc4.png)
-8. 
+8. Go to Write Contract and populate the createCoveredOption. Could be something similar to my example. You can get the timestamp from https://www.epochconverter.com/
+![image](https://user-images.githubusercontent.com/15021790/144903923-2aac5a7e-aa23-46af-909c-e0c72b596157.png)
+9. Put the same values in getCoveredOption to retrieve the address of your newly created option
+![image](https://user-images.githubusercontent.com/15021790/144904186-d0069407-2c11-4f17-ad84-069ee69c3ab5.png)
+10. Verify it if needed. After you've verified it once you won't need to do it again because it will be the same ByteCode. Use the flattener again for options.sol and remember to add the constructor arguments in the verificaiton. You can do that with the help from https://abi.hashex.org/
+![image](https://user-images.githubusercontent.com/15021790/144904437-005948c3-4727-463d-9f05-a903fe5b5c13.png)
+11. If you want to execute buyOption from the new option contract, you need to pick buyer and writer. Then, from the buyer copy the option address and give allowance to it so that your underlying token can be transferred to the option contract.
+![image](https://user-images.githubusercontent.com/15021790/144904831-fdec2f3e-a04d-44bc-932f-c35553e7d3be.png)
+12. After you've given allowance from your ERC20 token, go back to the option contract and login with the buyer.
+13. Populate the buyOption with the required ether and writer address. Note that the ether is specified in wei and you can use https://eth-converter.com/ to convert it correctly
+![image](https://user-images.githubusercontent.com/15021790/144905445-623ac374-cad6-480c-9641-699d44d5052f.png)
