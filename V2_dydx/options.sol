@@ -25,7 +25,7 @@ contract DecentralisedOption {
         uint256 totalBaseToken; // Total amount of baseToken collected on option exercise and held by this contract
     }
 
-    option private tokenOpt;
+    option public tokenOpt;
 
     constructor(address _underlyingTokenAddress, uint _strike, uint _premium, uint _expiry) {
         contractAddr = payable(address(this));
@@ -91,7 +91,7 @@ contract DecentralisedOption {
 
         if (underlyingTokenAmount > 0) {
             require(ERC20(tokenOpt.underlyingToken).transfer(writer, underlyingTokenAmount));
-            tokenOpt.totalUnderlyingToken -= 1;
+            tokenOpt.totalUnderlyingToken -= underlyingTokenAmount;
         }
 
         if (baseTokenAmount > 0) {
@@ -105,19 +105,66 @@ contract DecentralisedOption {
         return writers[who];
     }
 
-    function balanceOf(address who) view public returns (uint256) {
-        return balances[who];
-    }
-
-    function getOptionProperties() public view returns (option memory) {
-        return tokenOpt;
-    }
-
-    function getActiveUnderlyingTokenBalance() public view returns (uint256) {
+    function getActiveUnderlyingBalance() public view returns (uint256) {
         return tokenOpt.totalUnderlyingToken;
     }
 
     function getActiveBaseTokenBalance() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    // ---------------------
+    // ------- ERC20 -------
+    // ---------------------
+
+    mapping (address => mapping (address => uint256)) allowed;
+
+    function transfer(
+        address to,
+        uint value
+    ) public returns (
+        bool ok
+    ) {
+        if (balances[msg.sender] >= value) {
+            balances[msg.sender] -= value;
+            balances[to] += value;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint value
+    ) public returns (
+        bool ok
+    ) {
+        if (balances[from] >= value && allowed[from][msg.sender] >= value) {
+            balances[to] += value;
+            balances[from] -= value;
+            allowed[from][msg.sender] -= value;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function approve(address spender, uint value) public returns (bool ok) {
+      allowed[msg.sender][spender] = value;
+      return true;
+    }
+
+    function totalSupply() view public returns (uint supply) {
+        return tokenOpt.totalOptions;
+    }
+
+    function balanceOf(address who) view public returns (uint value) {
+        return balances[who];
+    }
+
+    function allowance(address owner, address spender) view public returns (uint _allowance) {
+        return allowed[owner][spender];
     }
 }
