@@ -59,10 +59,13 @@ Option trading as a decentralised entity on the blockchain
 
 **Chainlink Instructions**
 
-Much easier than dYdX. 
+Much easier than dYdX. Has a bit more properties like tokenPrice, but they are not that relevant to the actual options operations.
 1. Publish the contract
 2. Login with writer to write the option
-3. login with buyer to buy the option. The id of the option is just its index in the list.
-4. Exercise the option and both writer and buyer will get their funds immediately
+3. Before writing the option make sure that you've given allowance to the option address to transferFrom your underlying ERC20 token
+4. login with buyer to buy the option. The id of the option is just its index in the list.
+5. Exercise the option and both writer and buyer will get their funds immediately
+
+
 
 
